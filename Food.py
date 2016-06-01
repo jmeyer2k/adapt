@@ -10,16 +10,7 @@ from neat import nn, population, statistics
 
 SPEED = 3
 
-def rot_center(image, angle):
-    """rotate an image while keeping its center and size"""
-    orig_rect = image.get_rect()
-    rot_image = pygame.transform.rotate(image, angle)
-    rot_rect = orig_rect.copy()
-    rot_rect.center = rot_image.get_rect().center
-    rot_image = rot_image.subsurface(rot_rect).copy()
-    return rot_image
-
-class Organism:
+class Food:
     def __init__(self, x, main_game, genome):
         self._id = x
         self.main_game = main_game
@@ -28,7 +19,7 @@ class Organism:
         self._r = random.randint(0, 360) * 1.0
         self._line = 0
         self._sprite = pygame.Surface((20, 20))
-        pygame.draw.polygon(self._sprite, Color("Green"), ((6, 0), (0, 12), (12, 12)))
+        pygame.draw.polygon(self._sprite, Color("Purple"), ((6, 0), (0, 12), (12, 12)))
 
         self._net = nn.create_feed_forward_phenotype(genome)
         self._genome = genome
@@ -45,7 +36,7 @@ class Organism:
     def updateLogic(self):
         if self.alive:
             self.reload -= 1
-            self.hunger += 0.01
+            self.hunger += 0.1
             if self.hunger >= 10:
                 self.kill()
             self._genome.fitness += 1
@@ -56,13 +47,9 @@ class Organism:
                 if self._id == organism._id:
                     continue
                 if organism.alive:
-                    points.append((organism._x, organism._y, -1))
-                    for projectile in organism.projectiles:
-                        if projectile.alive:
-                            points.append((organism._x, organism._y, 1))
+                    points.append((organism._x, organism._y))
             rayTracer = FuzzyRayTracer(points, self._x, self._y, self._r)
             inputs = rayTracer.trace()
-            inputs += [self._x / self.main_game.screen_width, self._y / self.main_game.height]
             out = self._net.serial_activate(inputs)
 
             if out[0] > 0.5:
@@ -96,9 +83,10 @@ class Organism:
             if self._y < 0:
                 self._y = 0
                 self.hunger += 0.01
+
     def shoot(self):
         self.projectiles.append(Projectile(self._id, self._x, self._y, self._r, self.main_game, self))
-        self.hunger += 0.2;
+        self.hunger += 0.1;
 
     def drawVector(self, r, l):
         pygame.draw.line(self.main_game.screen, Color("white"), (self._x + 6, self._y + 6), (self._x + 6 + math.cos(r) * l, self._y + 6 + math.sin(r) * l), 1)

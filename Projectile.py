@@ -1,4 +1,5 @@
 import random
+from pygame.locals import *
 import pygame
 import math
 
@@ -11,7 +12,8 @@ class Projectile:
         self._x = x
         self._y = y
         self._r = r
-        self._sprite = main_game.sprites['projectile']
+        self._sprite = pygame.Surface((12, 12))
+        pygame.draw.circle(self._sprite, Color("Red"), (6, 6), 6)
         self.alive = True
         self.parent = parent
 
@@ -27,7 +29,7 @@ class Projectile:
                     continue
                 if organism._rect.colliderect(rect) and organism.alive:
                     organism.kill()
-                    self.parent.hunger -= 1
+                    self.parent.hunger -= 2
                     self.alive = False
 
             if self._x > self.main_game.screen_width - 25:

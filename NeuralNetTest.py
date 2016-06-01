@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import os
+import pickle
 
 from neat import nn, population, statistics
 from main import MainSimulation
@@ -25,6 +26,9 @@ print('Number of evaluations: {0}'.format(pop.total_evaluations))
 # Display the most fit genome.
 winner = pop.statistics.best_genome()
 print('\nBest genome:\n{!s}'.format(winner))
+
+with open('nn_winner_genome', 'wb') as f:
+    pickle.dump(winner, f)
 
 # # Visualize the winner network and plot/log statistics.
 # visualize.plot_stats(pop.statistics)

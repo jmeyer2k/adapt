@@ -17,7 +17,7 @@ class Simulation:
             if self.organisms[x].alive:
                 alive_organisms += 1
             self.organisms[x].updateLogic()
-        print alive_organisms
+        # print alive_organisms
         if alive_organisms <= 1:
             self.main_game.sim_over = True
 

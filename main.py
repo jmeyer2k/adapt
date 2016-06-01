@@ -1,4 +1,9 @@
+import sys
+import pickle
+
 import pygame
+
+
 from Simulation import Simulation
 
 STEPBYSTEP = False
@@ -57,7 +62,10 @@ class MainSimulation:
         self.display()
 
 if __name__ == '__main__':
-    sim = MainSimulation()
-    while sim.running:
-        sim.loop()
-    exit(0)
+    argument = sys.argv[1]
+    with open(argument, 'r') as f:
+        genome = pickle.load(f)
+        sim = MainSimulation(genome)
+        while sim.running:
+            sim.loop()
+        exit(0)
