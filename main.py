@@ -19,13 +19,22 @@ class MainSimulation:
 
         self.running = True
 
+        self.sim_over = False
+
+        self.graphics_on = True
+
     def updateLogic(self):
         self.simulation.updateLogic()
 
+    def eval_fitness(self, genomes):
+        self.sim_over = False
+        self.simulation.eval_fitness(genomes)
+
     def display(self):
-        self.screen.fill(0)
-        self.simulation.display()
-        pygame.display.flip()
+        if self.graphics_on:
+            self.screen.fill(0)
+            self.simulation.display()
+            pygame.display.flip()
 
     def handleEvents(self):
         for event in pygame.event.get():
@@ -34,9 +43,14 @@ class MainSimulation:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_g and STEPBYSTEP:
                     self.updateLogic()
+                if event.key == pygame.K_y:
+                    self.graphics_on = not self.graphics_on
+
 
 
     def loop(self):
+        # if not self.graphics_on:
+        #     print len(self.simulation.organisms)
         self.handleEvents()
         if not STEPBYSTEP:
             self.updateLogic()

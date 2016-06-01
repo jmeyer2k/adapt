@@ -1,7 +1,7 @@
 import math
 
 class FuzzyRayTracer:
-    def __init__(self, points, x, y, r, fov = 120, numRays = 20):
+    def __init__(self, points, x, y, r, fov = 180, numRays = 20):
         self.points = points
         self.x = x
         self.y = y

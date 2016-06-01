@@ -5,7 +5,7 @@ import math
 SPEED = 5
 
 class Projectile:
-    def __init__(self, id, x, y, r, main_game):
+    def __init__(self, id, x, y, r, main_game, parent):
         self._parentId = id
         self.main_game = main_game
         self._x = x
@@ -13,6 +13,7 @@ class Projectile:
         self._r = r
         self._sprite = main_game.sprites['projectile']
         self.alive = True
+        self.parent = parent
 
     def updateLogic(self):
         if self.alive:
@@ -26,6 +27,7 @@ class Projectile:
                     continue
                 if organism._rect.colliderect(rect) and organism.alive:
                     organism.kill()
+                    self.parent.hunger -= 1
                     self.alive = False
 
             if self._x > self.main_game.screen_width - 25:
