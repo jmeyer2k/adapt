@@ -41,6 +41,7 @@ class Organism:
 
     def kill(self):
         self.alive = False
+        self._genome.fitness += (10 - self.hunger) * 100
 
     def updateLogic(self):
         if self.alive:
@@ -62,20 +63,19 @@ class Organism:
                             points.append((organism._x, organism._y, 1))
             rayTracer = FuzzyRayTracer(points, self._x, self._y, self._r)
             inputs = rayTracer.trace()
-            inputs += [self._x / self.main_game.screen_width, self._y / self.main_game.height]
+            inputs += [self._x / self.main_game.screen_width, self._y / self.main_game.screen_height]
             out = self._net.serial_activate(inputs)
 
-            if out[0] > 0.5:
-                self._r += 3
-            if out[1] > 0.5:
-                self._r -= 3
+            self._r += 10 * (out[0] - 0.5)
+
             if out[2] > 0.5 and self.reload <= 0:
                 self.shoot()
                 self.reload = 50
 
             self._r  %= 360
-            self._x += math.cos(self._r / 180.0 * math.pi) * SPEED
-            self._y += math.sin(self._r / 180.0 * math.pi) * SPEED
+            if out[3] > 0.2:
+                self._x += math.cos(self._r / 180.0 * math.pi) * SPEED * (out[3] - 0.2) * 1.2
+                self._y += math.sin(self._r / 180.0 * math.pi) * SPEED * (out[3] - 0.2) * 1.2
 
             self._rect.left = self._x
             self._rect.top = self._y
@@ -86,16 +86,16 @@ class Organism:
                     offset -= 1
             if self._x > self.main_game.screen_width - 25:
                 self._x = self.main_game.screen_width - 25
-                self.hunger += 0.01
+                self.hunger += 0.05
             if self._y > self.main_game.screen_height - 25:
                 self._y = self.main_game.screen_height - 25
-                self.hunger += 0.01
+                self.hunger += 0.05
             if self._x < 0:
                 self._x = 0
-                self.hunger += 0.01
+                self.hunger += 0.05
             if self._y < 0:
                 self._y = 0
-                self.hunger += 0.01
+                self.hunger += 0.05
     def shoot(self):
         self.projectiles.append(Projectile(self._id, self._x, self._y, self._r, self.main_game, self))
         self.hunger += 0.2;
@@ -111,5 +111,10 @@ class Organism:
                 self.projectiles[x - 1].display(screen)
             # self.drawVector(self._line, 100)
             self.drawVector(self._r / 180 * math.pi, 20)
+            text_str = "food: " + str(10 - self.hunger) + ", fit: " + str(self._genome.fitness)
+            font = pygame.font.Font(None, 15)
+            text = font.render(text_str, 1, (255, 255, 255))
+            screen.blit(text, (round(self._x), round(self._y) + 12))
+
             # for x in range(20):
             #     self.drawVector((self._r - 60 + 6*x) / 180 * math.pi, 100)
